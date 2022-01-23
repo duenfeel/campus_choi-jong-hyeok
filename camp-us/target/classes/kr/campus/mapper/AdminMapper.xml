@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="kr.campus.mapper.AdminMapper">
+
+   <insert id="itemsEnroll">
+      insert into tbl_items(itemName,price,quantity,category,thumbnail,details)
+      values(
+      #{itemName},
+      #{price},
+      #{quantity},
+      #{category},
+      #{thumbnail},
+      #{details}
+      )
+   </insert>
+
+
+   <select id="adminshoplist" resultType="kr.campus.domain.ItemVO">
+      <![CDATA[
+         select * from 
+         (
+         select /*+INDEX_DESC(tbl_items) */  
+         rownum rn, itemcode, itemname, price, quantity, ratings, category, purchases, regdate, thumbnail 
+         from tbl_items
+         where category like '%'||#{category}||'%'
+         and rownum <= #{pageNum} * #{amount} order by regdate desc
+         )
+         where rn > (#{pageNum}-1) * #{amount} 
+      ]]>
+   </select>
+   
+   
+   
+   
+<!--    <select id="newList" resultType="kr.campus.domain.ItemVO">
+      <![CDATA[
+         select * from 
+         (
+         select /*+INDEX_DESC(tbl_items) */  
+         rownum rn, itemcode, itemname, price, quantity, ratings, category, purchases, regdate, thumbnail 
+         from tbl_items
+         where rownum <= #{pageNum} * #{amount} order by regdate desc
+         )
+         where rn > (#{pageNum}-1) * #{amount} 
+      ]]>
+   </select> -->
+   
+   
+   
+   <select id="getTotal" resultType="int">
+      select count(itemCode)
+      from tbl_items 
+      where category like '%'||#{category}||'%'
+   </select>
+   
+</mapper>
